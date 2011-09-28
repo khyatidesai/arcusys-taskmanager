@@ -1,0 +1,7 @@
+Arcusys Taskmanager is published under the terms of the GNU Affero General Public License with two exceptions. Arcusys Taskmanager 
+is using two Intalio WSDL files (TaskManagement.wsdl and TokenService.wsdl) which are published under the terms of Eclipse Public Licence - v 1.0.
+
+Arcusys Taskmanager is a Liferay portal portlet for managing Intalio (http://www.intalio.com/bpms) tasks. Supported Liferay version is 6.0.5 CE. Tested 
+Intalio BPMS server version is 6.0.3.015.
+
+Maven is used to build a deployable package into Liferay.
