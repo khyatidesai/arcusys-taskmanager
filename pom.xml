@@ -10,7 +10,7 @@
 	<name>taskmanager</name>
 
 	<modules>
-		<module>intalio-services</module>
+		<module>Intalio-services</module>
 		<module>task-manager-portlet</module>
 	</modules>
 
