@@ -43,9 +43,11 @@ if (Validator.isNotNull(portletResource)) {
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 }
 
-String taskFilter = preferences.getValue("taskFilter", "");
-String notifFilter = preferences.getValue("notifFilter", "");
-String refreshDuration = preferences.getValue("refreshDuration", "30");
-String openForm = preferences.getValue("openForm", "3");
+final String taskFilter = preferences.getValue("taskFilter", "");
+final String notifFilter = preferences.getValue("notifFilter", "");
+final String refreshDuration = preferences.getValue("refreshDuration", "30");
+final String openForm = preferences.getValue("openForm", "3");
+final String username =  preferences.getValue("username", "");
+final String password =  preferences.getValue("password", "");
 
 %>

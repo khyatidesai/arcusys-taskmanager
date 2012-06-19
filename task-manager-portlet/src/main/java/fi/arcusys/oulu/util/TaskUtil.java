@@ -1,23 +1,23 @@
 /**
  * $Id$
- * 
+ *
  * Copyright (C) 2011 Arcusys Oy - http://www.arcusys.fi/
- * 
+ *
  * This file is part of Arcusys Taskmanager.
- * 
+ *
  * Arcusys Taskmanager is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Arcusys Taskmanager is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package fi.arcusys.oulu.util;
@@ -31,12 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * May 10, 2011
  */
 public final class TaskUtil {
-	
+
 	private TaskUtil() {
         // prevents calls from subclass
         throw new UnsupportedOperationException();
     }
-	
+
 	/**
 	 * Superuser contains username and participant token of intalio server
 	 */
@@ -59,9 +59,9 @@ public final class TaskUtil {
 	 * @return intalio task type as in database
 	 */
 	public static String getTaskType(int taskType) {
-		
+
 		switch (taskType) {
-		
+
 		case TaskUtil.TASK:
 			return TaskUtil.TASK_TYPE;
 		case TaskUtil.NOTIFICATION:
@@ -71,34 +71,34 @@ public final class TaskUtil {
 		default:
 			return TaskUtil.TASK_TYPE;
 		}
-		
+
 	}
-	
-	/**
-	 * Adds username and its participant token
-	 * @param username current logged in user
-	 * @param token participant token
-	 */
-	public static void addToken(String username, String token) {
-		TaskUtil.TASK_HASHMAP.put(username, token);
-	}
-	
-	/**
-	 * Gets the participant token of user
-	 * @param username
-	 * @return participant token
-	 */
-	public static String getToken(String username) {
-		return TaskUtil.TASK_HASHMAP.get(username);
-	}
-	
-	/**
-	 * Deletes the participant token from hashmap
-	 * @param username current logged in user
-	 */
-	public static void removeToken(String username) {
-		TaskUtil.TASK_HASHMAP.remove(username);
-	}
-	
+
+//	/**
+//	 * Adds username and its participant token
+//	 * @param username current logged in user
+//	 * @param token participant token
+//	 */
+//	public static void addToken(String username, String token) {
+//		TaskUtil.TASK_HASHMAP.put(username, token);
+//	}
+//
+//	/**
+//	 * Gets the participant token of user
+//	 * @param username
+//	 * @return participant token
+//	 */
+//	public static String getToken(String username) {
+//		return TaskUtil.TASK_HASHMAP.get(username);
+//	}
+//
+//	/**
+//	 * Deletes the participant token from hashmap
+//	 * @param username current logged in user
+//	 */
+//	public static void removeToken(String username) {
+//		TaskUtil.TASK_HASHMAP.remove(username);
+//	}
+
 
 }

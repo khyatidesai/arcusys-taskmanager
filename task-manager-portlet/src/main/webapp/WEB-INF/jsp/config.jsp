@@ -23,34 +23,82 @@
 
 <%@ include file="init.jsp"%>
 
-<liferay-portlet:actionURL portletConfiguration="true" var="configActionURL" />
+<liferay-portlet:actionURL portletConfiguration="true"
+	var="configActionURL" />
 <div>
-	<form name="configForm" action="<liferay-portlet:actionURL portletConfiguration="true" />" method="post" >
+	<form name="configForm"
+		action="<liferay-portlet:actionURL portletConfiguration="true" />"
+		method="post">
 		<table class="task-config-table">
-			<tr><td><liferay-ui:message key="config.taskFilter" /></td><td><input type="text" name="taskFilter" value="<%= taskFilter %>" style="width: 100px;" /></td></tr>
-			<tr class="evenRow"><td><liferay-ui:message key="config.notifFilter" /></td><td><input type="text" name="notifFilter" value="<%= notifFilter %>" style="width: 100px;" /></td></tr> 
-			<tr><td><liferay-ui:message key="config.refreshDuration" /></td>
+			<tr>
+				<td>
+					<liferay-ui:message key="config.taskFilter" />
+				</td>
+				<td>
+					<input type="text" name="taskFilter" value="<%=taskFilter%>" style="width: 100px;" />
+				</td>
+			</tr>
+			<tr class="evenRow">
+				<td>
+					<liferay-ui:message key="config.notifFilter" />
+				</td>
+				<td>
+					<input type="text" name="notifFilter" value="<%=notifFilter%>" style="width: 100px;" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<liferay-ui:message key="config.refreshDuration" />
+				</td>
 				<td><select name="refreshDuration" id="refreshDuration">
 						<option value="10">10s</option>
 						<option value="30">30s</option>
 						<option value="60">1min</option>
 						<option value="900">15min</option>
 						<option value="1800">30min</option>
-				</select></td>
+				</select>
+				</td>
 			</tr>
-			<tr class="evenRow"><td><liferay-ui:message key="config.openForm" /></td>
+			<tr class="evenRow">
+				<td>
+					<liferay-ui:message key="config.openForm" />
+				</td>
 				<td><select name="openForm" id="openForm">
-						<option value="1" >In portlet</option>
-						<option value="2" >New window</option>
+						<option value="1">In portlet</option>
+						<option value="2">New window</option>
 						<option value="3">Pop-up</option>
-				</select></td>
+				</select>
+				</td>
 			</tr>
-			<tr><td><input type="submit" value="<liferay-ui:message key="config.save" />" /></td><td></td></tr>
+			<tr class="evenRow">
+				<td>
+					<liferay-ui:message key="config.user.username" />
+				</td>
+				<td>
+					<input type="text" name="username" value="<%=username%>" style="width: 100px;" />
+				</td>
+			</tr>
+			
+			<tr class="evenRow">
+				<td>
+					<liferay-ui:message key="config.user.password" />
+				</td>			
+				<td>
+					<input type="text" name="password" value="<%=password%>" style="width: 100px;" />
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="submit" value="<liferay-ui:message key="config.save" />" />
+				</td>
+				<td></td>
+			</tr>
 		</table>
 	</form>
 </div>
 <script type="text/javascript">
 	// set the default selected option for selectors refreshDuration and openForm
-	$('#refreshDuration').val("<%= refreshDuration %>");
-	$('#openForm').val("<%= openForm %>");
+	$('#refreshDuration').val("<%=refreshDuration%>");
+	$('#openForm').val("<%=openForm%>");
 </script>

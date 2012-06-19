@@ -1,23 +1,23 @@
 /**
  * $Id$
- * 
+ *
  * Copyright (C) 2011 Arcusys Oy - http://www.arcusys.fi/
- * 
+ *
  * This file is part of Arcusys Taskmanager.
- * 
+ *
  * Arcusys Taskmanager is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Arcusys Taskmanager is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  */
 
 package fi.arcusys.oulu.intalio;
@@ -36,6 +36,8 @@ import java.util.TimeZone;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import fi.arcusys.intalio.tms.TaskMetadata;
+import fi.arcusys.oulu.exception.IntalioException;
+import fi.arcusys.oulu.exception.TaskMgrException;
 import fi.arcusys.oulu.util.TaskUtil;
 import fi.arcusys.oulu.util.Util;
 
@@ -50,29 +52,31 @@ public class TaskHandle {
 	private String message;
 	private String participantToken;
 	private String username;
-	private Properties props;
+	private final Properties props;
 
 	/**
 	 * Constructor and initialization
+	 * @throws IntalioException
 	 */
-	public TaskHandle() {
+	public TaskHandle() throws IntalioException {
 		this.message = "";
 		this.participantToken = null;
 		this.props = Util.loadProperties();
 		if (props == null) {
-			throw new RuntimeException("Couldn't load properties file");
+			throw new IntalioException("Couldn't load properties file");
 		}
 	}
 
 	/**
 	 * Constructor with intalio participant token and username
+	 * @throws IntalioException
 	 */
-	public TaskHandle(String token, String username) {
+	public TaskHandle(String token, String username) throws IntalioException {
 		this.participantToken = token;
 		this.username = username;
 		this.props = Util.loadProperties();
 		if (props == null) {
-			throw new RuntimeException("Couldn't load properties file");
+			throw new IntalioException("Couldn't load properties file");
 		}
 	}
 
@@ -81,38 +85,40 @@ public class TaskHandle {
 	 * @param taskType the intalio task type
 	 * @param keyword the keyword for searching/filetering
 	 * @param orderType order type of tasks
-	 * @param first the beginning index of the tasks 
+	 * @param first the beginning index of the tasks
 	 * @param max the maximum tasks to be queried
 	 * @return available task list
+	 * @throws IntalioException
 	 */
-	public List<Task> getTasksByParams(int taskType, String keyword, 
-			String orderType, String first, String max) {
+	public List<Task> getTasksByParams(int taskType, String keyword,
+			String orderType, String first, String max) throws IntalioException {
 		List<Task> tasks = null;
 		String taskTypeStr = TaskUtil.getTaskType(taskType);
-		String subQuery = "";				
+		String subQuery = "";
 		subQuery = createTaskSubQuery(taskType, keyword, orderType);
 		tasks = getTasksFromServ(taskTypeStr, subQuery, first, max);
-		
+
 		return tasks;
 	}
-	
+
 	/**
 	 * Get tasks from task management service
 	 * @param taskType the intalio task type
 	 * @param subQuery the sql string for intalio tasks database
-	 * @param first the beginning index of the tasks 
+	 * @param first the beginning index of the tasks
 	 * @param max the maximum tasks to be queried
 	 * @return a list of tasks
+	 * @throws IntalioException
 	 */
-	public List<Task> getTasksFromServ(String taskType, String subQuery, String first, String max) {
+	public List<Task> getTasksFromServ(String taskType, String subQuery, String first, String max) throws IntalioException {
 		List<Task> myTasklist = new ArrayList<Task>();
 		TaskManagementService taskMngServ = new TaskManagementService(
 				props.getProperty(Util.TMS_WSDL_KEY),
 				props.getProperty(Util.TOKEN_WSDL_KEY));
-		List<TaskMetadata> tasklist = taskMngServ.getAvailableTasks(participantToken, taskType, subQuery, 
+		List<TaskMetadata> tasklist = taskMngServ.getAvailableTasks(participantToken, taskType, subQuery,
         		first, max);
 		myTasklist = createTask(tasklist);
-		
+
 		return myTasklist;
 	}
 
@@ -120,20 +126,21 @@ public class TaskHandle {
 	 * Get task status such as 'READY', 'CLAIMED', 'COMPLETED'
 	 * @param taskId intalio task id
 	 * @return the intalio task status
+	 * @throws TaskMgrException
 	 */
-	public String getTaskStatus(String taskId) {
+	public String getTaskStatus(String taskId) throws IntalioException {
 		String status;
 		TaskManagementService taskMngServ = new TaskManagementService(
 				props.getProperty(Util.TMS_WSDL_KEY),
 				props.getProperty(Util.TOKEN_WSDL_KEY));
 		status = taskMngServ.getTask(taskId, participantToken).getMetadata().getTaskState();
-		
+
 		return status;
 	}
-	
+
 	/**
 	 * Create task model to be shown in portlet from intalio task
-	 * 
+	 *
 	 * @param tasklist a list of intalio tasks
 	 * @return formatted task list to be presented on web
 	 */
@@ -141,12 +148,12 @@ public class TaskHandle {
 		List<Task> myTasklist = new ArrayList<Task>();
 		Task myTask = new Task();
 		Iterator<TaskMetadata> it = tasklist.iterator();
-		
+
 		while (it.hasNext()) {
 			TaskMetadata task = it.next();
 			myTask = new Task();
 			myTask.setDescription(task.getDescription());
-			
+
 			if (task.getTaskState() != null) {
 				myTask.setState(task.getTaskState().toString());
 			} else {
@@ -160,7 +167,7 @@ public class TaskHandle {
 
 		return myTasklist;
 	}
-	
+
 	/**
 	 * Format the task date with given format and Helsinki timezone
 	 * @param xmlGregorianCalendar
@@ -172,28 +179,28 @@ public class TaskHandle {
 		"d.M.yyyy HH:mm:ss");
 		dataformat.setTimeZone(TimeZone.getTimeZone("Europe/Helsinki"));
 		String dateStr = dataformat.format(cal.getTime());
-		
-		return dateStr;		
+
+		return dateStr;
 	}
-	
+
 	/**
 	 * Create form operation link of task
 	 * @param task intalio task object
 	 * @return intalio task form string
 	 */
 	public String createTaskLink(TaskMetadata task) {
-		String link = "";		
+		String link = "";
 		String taskType = "";
         String url = "";
         String formParam = "";
         String prefix = "http";
         Object[] params = null;
         String type = task.getTaskType().toString();
-		
+
         url = task.getFormUrl();
-        
-		if (type.equals("ACTIVITY")) { // tasks	
-			taskType = TaskUtil.TASK_TYPE;	
+
+		if (type.equals("ACTIVITY")) { // tasks
+			taskType = TaskUtil.TASK_TYPE;
 			if(!url.startsWith(prefix)) {
 				formParam = "xFormsManager/act";
 			}
@@ -208,15 +215,15 @@ public class TaskHandle {
 				formParam = "xFormsManager/init";
 			}
 		} else {
-			taskType = TaskUtil.TASK_TYPE;			
+			taskType = TaskUtil.TASK_TYPE;
 		}
-		
+
 		if(!url.startsWith(prefix)) {
 			url = props.getProperty(Util.INTALIO_URL) + formParam;
 		}
-		
+
 		try {
-			params = new Object[] { url, task.getTaskId(), taskType, 
+			params = new Object[] { url, task.getTaskId(), taskType,
 					URLEncoder.encode(task.getFormUrl().toString(), "UTF-8"), participantToken,
 			        URLEncoder.encode(username, "UTF-8"), false };
 		} catch (UnsupportedEncodingException e) {
@@ -232,8 +239,9 @@ public class TaskHandle {
 	 * @param taskType the intalio task type
 	 * @param subQuery the sql string for intalio tasks database
 	 * @return total number of total tasks
+	 * @throws IntalioException
 	 */
-	public int getTotalTasksNumber(int taskType, String keyword) {
+	public int getTotalTasksNumber(int taskType, String keyword) throws IntalioException {
 		int totalNum = 0;
 		String subQuery;
 		String totalNumStr;
@@ -245,11 +253,11 @@ public class TaskHandle {
 				props.getProperty(Util.TOKEN_WSDL_KEY));
 		totalNumStr = taskMngServ.getTotalTasksNumber(participantToken, taskTypeStr, subQuery);
 		totalNum = Integer.parseInt(totalNumStr);
-		
-		return totalNum;		
-		
+
+		return totalNum;
+
 	}
-	
+
 	/**
 	 * Create subquery to get total number of tasks
 	 * @param taskType the intalio task type
@@ -262,9 +270,9 @@ public class TaskHandle {
 		switch (taskType) {
 
 		case TaskUtil.TASK:
-			subQuery = "(T._state = TaskState.READY OR T._state = TaskState.CLAIMED)" 
+			subQuery = "(T._state = TaskState.READY OR T._state = TaskState.CLAIMED)"
 					 + " AND T._description like '%" + keyword + "%'";
-			break;			
+			break;
 		case TaskUtil.NOTIFICATION:
 			subQuery = "T._state = TaskState.READY" + " AND T._description like '%" + keyword + "%'";
 			break;
@@ -278,7 +286,7 @@ public class TaskHandle {
 		return subQuery;
 
 	}
-	
+
 	/**
 	 * Create subquery to get available tasks
 	 * @param taskType the intalio task type
@@ -292,17 +300,17 @@ public class TaskHandle {
 		switch (taskType) {
 
 		case TaskUtil.TASK:
-			subQuery = "(T._state = TaskState.READY OR T._state = TaskState.CLAIMED)" 
+			subQuery = "(T._state = TaskState.READY OR T._state = TaskState.CLAIMED)"
 				+ " AND T._description like '%" + keyword + "%'"
 				+ " ORDER BY " + orderTypeStr;
 			break;
 		case TaskUtil.NOTIFICATION:
-			subQuery = "T._state = TaskState.READY" 
+			subQuery = "T._state = TaskState.READY"
 				+ " AND T._description like '%" + keyword + "%'"
 				+ " ORDER BY " + orderTypeStr;
 			break;
 		case TaskUtil.PROCESS:
-			subQuery = "T._description like '%" + keyword + "%'" 
+			subQuery = "T._description like '%" + keyword + "%'"
 				+ " ORDER BY " + orderTypeStr;
 			break;
 		default:
@@ -313,7 +321,7 @@ public class TaskHandle {
 		return subQuery;
 
 	}
-	
+
 	/**
 	 * Get query order type according to order string from jsp page
 	 * @param orderType order type of tasks
@@ -321,7 +329,7 @@ public class TaskHandle {
 	 */
 	public String getOrderTypeStr(String orderType) {
 		String orderTypeStr;
-		
+
 		if(orderType.equals("description_desc")) {
 			orderTypeStr = "T._description DESC";
 		}else if(orderType.equals("description_asc")) {
@@ -337,17 +345,18 @@ public class TaskHandle {
 		}else {
 			orderTypeStr = "T._creationDate DESC";
 		}
-		
+
 		return orderTypeStr;
-	} 
-	
+	}
+
 	/**
 	 * Get token authenticated by username and password
 	 * @param username username of intalio user
 	 * @param password password of intalio user
 	 * @return intalio participant token
+	 * @throws IntalioException
 	 */
-	public String getTokenByUser(String username, String password) {
+	public String getTokenByUser(String username, String password) throws IntalioException {
 		String token = null;
 		TaskManagementService taskMngServ = new TaskManagementService(
 				props.getProperty(Util.TMS_WSDL_KEY),
@@ -366,7 +375,7 @@ public class TaskHandle {
 	}
 
 	/**
-	 * Set participant token 
+	 * Set participant token
 	 * @param token intalio participant token
 	 */
 	public void setToken(String token) {

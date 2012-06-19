@@ -23,6 +23,6 @@
  -->
  <display>
  	<category name="category.taskManager">
- 		<portlet id="taskManager" />
+ 		<portlet id="taskManagerKesla" />
  	</category>
  </display>
